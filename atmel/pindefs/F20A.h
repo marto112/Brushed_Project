@@ -60,6 +60,10 @@ Still would not classify as battle tested.
 #define RC_HIGH 400
 #define RC_MID 275
 
+#define  RC_LOW_2IN1  50
+#define  RC_HIGH_2IN1   200
+#define  RC_MID_2IN1   (RC_HIGH_2IN1 - RC_LOW_2IN1)/2
+
 /* There is also lots of connections for inputs from ADC and stuff but that can be added later
    if we want to be able to monitor battery voltage could also look at back EMF and some other stuff */
 

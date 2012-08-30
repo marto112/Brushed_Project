@@ -2,7 +2,7 @@
 2 motors off one ESC code file. 
 */
 //Set your controller here
-#include "../pindefs/Dlux20.h"
+#include "../pindefs/F20A.h"
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -21,9 +21,9 @@
 #define spinLeft 4
 #define spinRight 5
 
-#define  RC_LOW  100
-#define  RC_HIGH  200
-#define  RC_MID  150
+//#define  RC_LOW_2IN1  100
+//#define  RC_HIGH_2IN1   200
+//#define  RC_MID_2IN1   150
 
 
 void send_uint16_t(uint16_t data){
@@ -192,7 +192,7 @@ int main(){
             //Send Data
 
             //valid pulse
-            if ((timeCH1 > (RC_LOW - buffer)) && (timeCH1 < (RC_HIGH + buffer)) && (timeCH2 > (RC_LOW - buffer)) && (timeCH2 < (RC_HIGH + buffer))){
+            if ((timeCH1 > (RC_LOW_2IN1 - buffer)) && (timeCH1 < (RC_HIGH_2IN1 + buffer)) && (timeCH2 > (RC_LOW_2IN1 - buffer)) && (timeCH2 < (RC_HIGH_2IN1 + buffer))){
                 failsafe++;
                 
                 if (failsafe > 10){   //Need 10 good pulses before we start
@@ -236,12 +236,12 @@ int main(){
                 //CH1 = timeCH1;
                 //CH2 = timeCH2;
 				//Calc Norms
-		        int16_t normSteer = CH1 - RC_MID;
-        		int16_t normForward = CH2 - RC_MID;	
+		        int16_t normSteer = CH1 - RC_MID_2IN1;
+        		int16_t normForward = CH2 - RC_MID_2IN1;	
 		        //Work out the magnitude of the RC signal.
 		        uint16_t squared = normForward*normForward + normSteer*normSteer; //this gives a squared distance up to 15 bits. 
 		        //SQRT for linear or just scale it to keep exponential rates
-		        int16_t magnitude = isqrt(squared)*255/(RC_MID - RC_LOW); //Scale to 8 bit from 15.
+		        int16_t magnitude = isqrt(squared)*255/(RC_MID_2IN1 - RC_LOW_2IN1); //Scale to 8 bit from 15.
                 int16_t angle = 10000 *atan2(normForward,normSteer);
 
                 if (magnitude > 255){
@@ -298,14 +298,14 @@ int main(){
                     //Back Forward Mode
                     if (newState == forward){
                         goForwards();                        
-                            int16_t temp = magnitude - (normSteer*magnitude/(RC_MID - RC_LOW));
+                            int16_t temp = magnitude - (normSteer*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1));
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){
                                 temp = 255;
                             }
                             OCR1A = temp ;
-                            temp = magnitude + (normSteer*magnitude/(RC_MID - RC_LOW));
+                            temp = magnitude + (normSteer*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1));
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){
@@ -317,14 +317,14 @@ int main(){
                     }
                     else if (newState == backward) {
                         goBackwards();
-                            int16_t temp = magnitude + (normSteer*magnitude/(RC_MID - RC_LOW));
+                            int16_t temp = magnitude + (normSteer*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1));
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){
                                 temp = 255;
                             }
                             OCR1A = temp ;
-                            temp = magnitude - (normSteer*magnitude/(RC_MID - RC_LOW));
+                            temp = magnitude - (normSteer*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1));
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){
@@ -335,7 +335,7 @@ int main(){
                     else {
                         if (newState == spinRight){
                             goSpinRight();  
-                            int16_t temp = magnitude/2 + (normForward*magnitude/(RC_MID - RC_LOW)/2);
+                            int16_t temp = magnitude/2 + (normForward*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1)/2);
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){
@@ -346,7 +346,7 @@ int main(){
                         }
                         else {;
                             goSpinLeft();  
-                            int16_t temp = magnitude/2 - (normForward*magnitude/(RC_MID - RC_LOW)/2);
+                            int16_t temp = magnitude/2 - (normForward*magnitude/(RC_MID_2IN1 - RC_LOW_2IN1)/2);
                             if (temp < 10){
                                 temp = 10;
                             } else if (temp > 255){

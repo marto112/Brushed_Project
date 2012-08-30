@@ -58,27 +58,31 @@ uint8_t EEMEM storedTempLimit = TEMP_LIMIT;
    Reverse = C Low,  A High
  */
 
-#define FORWARD_LOW  LOW_A
-#define FORWARD_LOW_PORT   LOW_A_PORT
+#define setForwardLow  setALow
+#define clrForwardLow   clrALow
 
-#define FORWARD_HIGH HIGH_C
-#define FORWARD_HIGH_PORT  HIGH_C_PORT
+#define setForwardHigh setCHigh
+#define clrForwardHigh  clrCHigh
 
-#define BACKWARD_LOW  LOW_C
-#define BACKWARD_LOW_PORT  LOW_C_PORT
+#define setBackwardLow  setCLow
+#define clrBackwardLow  clrCLow
 
-#define BACKWARD_HIGH HIGH_A
-#define BACKWARD_HIGH_PORT HIGH_A_PORT
+#define setBackwardHigh setAHigh
+#define clrBackwardHigh clrAHigh
 
-inline void setForwardLow();
-inline void clrForwardLow();
-inline void setForwardHigh();
-inline void clrForwardHigh();
 
-inline void setBackwardLow();
-inline void clrBackwardLow();
-inline void setBackwardHigh();
-inline void clrBackwardHigh();
+inline void setALow();
+inline void clrALow();
+inline void setAHigh();
+inline void clrAHigh();
+inline void setBLow();
+inline void clrBLow();
+inline void setBHigh();
+inline void clrBHigh();
+inline void setCLow();
+inline void clrCLow();
+inline void setCHigh();
+inline void clrCHigh();
 
 //Motor State Functions
 void goForwards();
@@ -331,69 +335,6 @@ ISR(ADC_vect) {
 }
 #endif
 
-inline void setForwardLow() {
-    if (LOW_ACTIVE_LOW) {
-        FORWARD_LOW_PORT &= ~(1 << FORWARD_LOW);
-    } else {
-        FORWARD_LOW_PORT |= (1 << FORWARD_LOW);
-    }
-}
-
-inline void clrForwardLow() {
-    if (LOW_ACTIVE_LOW) {
-        FORWARD_LOW_PORT |= (1 << FORWARD_LOW);
-    } else {
-        FORWARD_LOW_PORT &= ~(1 << FORWARD_LOW);
-    }
-}
-
-inline void setForwardHigh() {
-    if (HIGH_ACTIVE_LOW) {
-        FORWARD_HIGH_PORT &= ~(1 << FORWARD_HIGH);
-    } else {
-        FORWARD_HIGH_PORT |= (1 << FORWARD_HIGH);
-    }
-}
-
-inline void clrForwardHigh() {
-    if (HIGH_ACTIVE_LOW) {
-        FORWARD_HIGH_PORT |= (1 << FORWARD_HIGH);
-    } else {
-        FORWARD_HIGH_PORT &= ~(1 << FORWARD_HIGH);
-    }
-}
-
-inline void setBackwardLow() {
-    if (LOW_ACTIVE_LOW) {
-        BACKWARD_LOW_PORT &= ~(1 << BACKWARD_LOW);
-    } else {
-        BACKWARD_LOW_PORT |= (1 << BACKWARD_LOW);
-    }
-}
-
-inline void clrBackwardLow() {
-    if (LOW_ACTIVE_LOW) {
-        BACKWARD_LOW_PORT |= (1 << BACKWARD_LOW);
-    } else {
-        BACKWARD_LOW_PORT &= ~(1 << BACKWARD_LOW);
-    }
-}
-
-inline void setBackwardHigh() {
-    if (HIGH_ACTIVE_LOW) {
-        BACKWARD_HIGH_PORT &= ~(1 << BACKWARD_HIGH);
-    } else {
-        BACKWARD_HIGH_PORT |= (1 << BACKWARD_HIGH);
-    }
-}
-
-inline void clrBackwardHigh() {
-    if (HIGH_ACTIVE_LOW) {
-        BACKWARD_HIGH_PORT |= (1 << BACKWARD_HIGH);
-    } else {
-        BACKWARD_HIGH_PORT &= ~(1 << BACKWARD_HIGH);
-    }
-}
 
 //Motor State Functions
 
@@ -482,22 +423,113 @@ void fastBeep(uint8_t length) {
     OCR2 = 0;
 }
 
-
-void readData() {
-    //if we have valid EEPROM data read it in
-    if (eeprom_read_word(&storedRcLow) != 0xFFFF) {
-        rcLow = eeprom_read_word(&storedRcLow);
-        rcHigh = eeprom_read_word(&storedRcHigh);
-        rcMid = (rcLow + rcHigh) / 2;
+//Motor Pin functions
+inline void setALow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_A_PORT &= ~(1 << LOW_A); 
     }
-    if (eeprom_read_byte(&storedSlewRate) != 0xFF) {
-        maxSlew = eeprom_read_byte(&storedSlewRate);
-    }
-    if (eeprom_read_byte(&storedTempLimit) != 0xFF) {
-        tempLimit = eeprom_read_byte(&storedTempLimit);
-    }
-    if (eeprom_read_byte(&storedExpo) != 0xFF) {
-        goExpo = eeprom_read_byte(&storedExpo);
+    else {
+        LOW_A_PORT |= (1 << LOW_A);     
     }
 }
 
+inline void clrALow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_A_PORT |= (1 << LOW_A); 
+    }
+    else {
+        LOW_A_PORT &= ~(1 << LOW_A);
+    }
+}
+
+inline void setAHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_A_PORT &= ~(1 << HIGH_A);
+    }
+    else {
+        HIGH_A_PORT |= (1 << HIGH_A);
+    }
+}
+
+
+
+inline void clrAHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_A_PORT |= (1 << HIGH_A);
+    }
+    else {
+        HIGH_A_PORT &= ~(1 << HIGH_A);
+    }
+}
+
+inline void setBLow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_B_PORT &= ~(1 << LOW_B); 
+    }
+    else {
+        LOW_B_PORT |= (1 << LOW_B);     
+    }
+}
+
+inline void clrBLow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_B_PORT |= (1 << LOW_B); 
+    }
+    else {
+        LOW_B_PORT &= ~(1 << LOW_B);
+    }
+}
+
+inline void setBHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_B_PORT &= ~(1 << HIGH_B);
+    }
+    else {
+        HIGH_B_PORT |= (1 << HIGH_B);
+    }
+}
+
+inline void clrBHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_B_PORT |= (1 << HIGH_B);
+    }
+    else {
+        HIGH_B_PORT &= ~(1 << HIGH_B);
+    }
+}
+
+inline void setCLow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_C_PORT &= ~(1 << LOW_C); 
+    }
+    else {
+        LOW_C_PORT |= (1 << LOW_C);     
+    }
+}
+
+inline void clrCLow(){
+    if (LOW_ACTIVE_LOW){
+        LOW_C_PORT |= (1 << LOW_C); 
+    }
+    else {
+        LOW_C_PORT &= ~(1 << LOW_C);
+    }
+}
+
+inline void setCHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_C_PORT &= ~(1 << HIGH_C);
+    }
+    else {
+        HIGH_C_PORT |= (1 << HIGH_C);
+    }
+}
+
+inline void clrCHigh(){
+    if (HIGH_ACTIVE_LOW){
+        HIGH_C_PORT |= (1 << HIGH_C);
+    }
+    else {
+        HIGH_C_PORT &= ~(1 << HIGH_C);
+    }
+}
